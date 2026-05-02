@@ -1,0 +1,21 @@
+[plugin]
+name = "envcheck"
+version = "0.1.0"
+description = "Validate .env files against .env.example — find missing or extra variables"
+protocol = "fledge-v1"
+runtime = "wasm"
+
+[[commands]]
+name = "envcheck"
+description = "Check .env for missing variables defined in .env.example"
+binary = "target/wasm32-wasip1/release/fledge-plugin-envcheck.wasm"
+
+[hooks]
+build = "cargo build --target wasm32-wasip1 --release"
+
+[capabilities]
+exec = false
+store = false
+metadata = false
+filesystem = "project"
+network = false
