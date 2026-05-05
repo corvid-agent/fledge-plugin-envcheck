@@ -1,7 +1,8 @@
 [plugin]
-name = "envcheck"
+name = "fledge-plugin-envcheck"
 version = "0.1.0"
 description = "Validate .env files against .env.example — find missing or extra variables"
+author = "corvid-agent"
 protocol = "fledge-v1"
 runtime = "wasm"
 
