@@ -31,7 +31,10 @@ fn json_escape(s: &str) -> String {
 }
 
 fn output(text: &str) {
-    fledge_send(&format!(r#"{{"type":"output","text":"{}"}}"#, json_escape(text)));
+    fledge_send(&format!(
+        r#"{{"type":"output","text":"{}"}}"#,
+        json_escape(text)
+    ));
 }
 
 fn parse_env_keys(content: &str) -> Vec<(String, bool)> {
@@ -81,8 +84,11 @@ fn find_env_files(path: &str) -> Vec<(String, String)> {
             Err(_) => continue,
         };
         let name = entry.file_name().to_string_lossy().to_string();
-        if ft.is_dir() && !name.starts_with('.')
-            && name != "node_modules" && name != "target" && name != "vendor"
+        if ft.is_dir()
+            && !name.starts_with('.')
+            && name != "node_modules"
+            && name != "target"
+            && name != "vendor"
         {
             let sub = format!("{}/{}", path, name);
             pairs.extend(find_env_files(&sub));
@@ -109,8 +115,7 @@ fn main() {
     let mut total_empty = 0u32;
 
     for (example_path, env_path) in &pairs {
-        let display_dir = if example_path.starts_with("/project/") {
-            let trimmed = &example_path[9..];
+        let display_dir = if let Some(trimmed) = example_path.strip_prefix("/project/") {
             if let Some(slash) = trimmed.rfind('/') {
                 &trimmed[..slash]
             } else {
@@ -136,7 +141,10 @@ fn main() {
 
         let env_content = match std::fs::read_to_string(env_path) {
             Err(_) => {
-                output(&format!("  \u{2717} .env file missing! {} required keys:\n", example_keys.len()));
+                output(&format!(
+                    "  \u{2717} .env file missing! {} required keys:\n",
+                    example_keys.len()
+                ));
                 for (key, _) in &example_keys {
                     output(&format!("    - {}\n", key));
                     total_missing += 1;
@@ -175,7 +183,10 @@ fn main() {
         }
 
         if missing.is_empty() && extra.is_empty() && empty.is_empty() {
-            output(&format!("  \u{2713} All {} keys present and set\n", example_keys.len()));
+            output(&format!(
+                "  \u{2713} All {} keys present and set\n",
+                example_keys.len()
+            ));
         } else {
             if !missing.is_empty() {
                 output(&format!("  \u{2717} Missing ({}):\n", missing.len()));
@@ -208,13 +219,19 @@ fn main() {
         output("  \u{2713} All environment files are complete.\n\n");
     } else {
         if total_missing > 0 {
-            output(&format!("  {} missing key(s) — add to .env\n", total_missing));
+            output(&format!(
+                "  {} missing key(s) — add to .env\n",
+                total_missing
+            ));
         }
         if total_empty > 0 {
             output(&format!("  {} empty value(s) — set in .env\n", total_empty));
         }
         if total_extra > 0 {
-            output(&format!("  {} extra key(s) — consider adding to example\n", total_extra));
+            output(&format!(
+                "  {} extra key(s) — consider adding to example\n",
+                total_extra
+            ));
         }
         output("\n");
     }
